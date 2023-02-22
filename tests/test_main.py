@@ -1,8 +1,8 @@
 from fastapi.testclient import TestClient
 from fastapi import status
-from main import app
-
-client=TestClient(app=app)
+import API
+from API import main
+client=TestClient(app=main.app)
 
 def test_index_returns_correct():
 
