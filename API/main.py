@@ -106,7 +106,7 @@ def read_item(query: Union[str, None] = None):
 @app.get("/")
 def connection_checkpoint():
    
-     return JSONResponse(content="Redis connection isa successfuly!",status_code=200)
+     return JSONResponse(content="Redis connection is successfuly!",status_code=200)
 
 if __name__ == '__main__':
     uvicorn.run(app,host="127.0.0.1",port=8000)
