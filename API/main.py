@@ -5,8 +5,8 @@ from typing import Union
 from PIL import Image
 import io
 import base64
-
-
+import redis
+import uvicorn
 
 
 
@@ -33,7 +33,7 @@ async def create_file(file_base_64: Union[str, None] = None):
 
             result = {
                 "data": len(file_base_64),
-                "message":"Islem Basarili Bir Sekilde Gerceklesti",
+                "message":"Process is successful!",
                 "success": True
             }
 
@@ -41,19 +41,18 @@ async def create_file(file_base_64: Union[str, None] = None):
         else:
             result = {
                 "data": "",
-                "message":"Base64 Alinamadi",
+                "message":"Unexpected Error",
                 "success": False
             }
             return JSONResponse(content=result, status_code=400)
     except:
         result = {
             "data": "",
-            "message":"Bir Hata Ile Karsilasildi",
+            "message":"Unexcepted Error",
             "success": False
         }
         return JSONResponse(content=result, status_code=500)
 
-# Kullanıcıdan Sorgu alma 1. yöntem (PathVariable)
 @app.post("/createQuery/{query}")
 def read_item(query: str):
 
@@ -61,7 +60,7 @@ def read_item(query: str):
 
         result = {
             "data": query,
-            "message":"Islem Basarili Bir Sekilde Gerceklesti",
+            "message":"Process is successful!",
             "success": True
         }
 
@@ -71,15 +70,13 @@ def read_item(query: str):
 
         result = {
             "data": "",
-            "message":"Query Alinamadi",
+            "message":"Query Failed!",
             "success": False
         }
 
         return JSONResponse(content=result, status_code=400)
 
 
-
-# Kullanıcıdan Sorgu alma 2. yöntem (RequestParams)
 @app.post("/createQuery2")
 def read_item(query: Union[str, None] = None):
 
@@ -87,7 +84,7 @@ def read_item(query: Union[str, None] = None):
 
         result = {
             "data": query,
-            "message":"Islem Basarili Bir Sekilde Gerceklesti",
+            "message":"Process is successful!",
             "success": True
         }
 
@@ -97,8 +94,18 @@ def read_item(query: Union[str, None] = None):
 
         result = {
             "data": "",
-            "message":"Query Alinamadi",
+            "message":"Query Failed!",
             "success": False
         }
 
         return JSONResponse(content=result, status_code=400)
+        
+@app.get("/checkpoint")
+def connection_checkpoint():
+    if redis_client.ping():
+        return JSONResponse(content="Redis connection is successfuly!",status_code=200)
+    else:
+        return JSONResponse(content="Redis connection is not successfuly!",status_code=500)
+
+if __name__ == '__main__':
+    uvicorn.run(app,host="127.0.0.1",port=8000)
