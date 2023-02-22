@@ -49,7 +49,7 @@ async def create_file(file: bytes = File()):
     return JSONResponse(content=result, status_code=200)
 
 # Query method 1(Path Variable)
-@app.post("/query(create1/{query}")
+@app.post("/query/create1/{query}")
 def read_item(query: str):
     
     result = objectToJson(Result(query, True, "Process succeeded."))
@@ -64,7 +64,7 @@ def read_item(q: Union[str, None] = None):
 
     return JSONResponse(content=result, status_code=200)
 
-@app.get("/checkpoint")
+@app.get("/healthcheck")
 def connection_checkpoint():
     if redis_client.ping():
         return JSONResponse(content="Redis connection is successfuly!",status_code=200)
