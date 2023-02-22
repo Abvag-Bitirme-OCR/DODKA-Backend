@@ -6,7 +6,7 @@ client=TestClient(app=app)
 
 def test_index_returns_correct():
 
-    response=client.get("/healthcheck")
+    response=client.get("/")
 
     assert response.status_code == status.HTTP_200_OK
     assert response.json() == 'Redis connection is successfuly!'
