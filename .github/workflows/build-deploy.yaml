@@ -18,5 +18,18 @@ jobs:
         run: python -m pip install --upgrade pip
       - name: Install all dependecies
         run: pip install -r requirements.txt
+      - name: Start the API
+        run: |
+        uvicorn main:app --port 8080 &
+        sleep 5
+      - name: Run pytest with coverage
+        run: |
+          pytest --cov=app --cov-report xml --cov-fail-under=90 pytest/
+      - name: Upload coverage report
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: coverage.xml
+          flags: unittests
 
 
