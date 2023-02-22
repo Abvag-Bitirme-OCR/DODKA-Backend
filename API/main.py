@@ -8,8 +8,6 @@ import base64
 import redis
 import uvicorn
 
-
-
 # If you create redis please download Docker and run this command;
 # docker container run --name=docker-container -d -p 6379:6379 redis
 
@@ -18,8 +16,8 @@ import uvicorn
 # pip install pillow
 # pip install python-multipart
 
-
 app = FastAPI()
+
 # Query from user (FromQuery)
 @app.post("/file")
 async def create_file(file_base_64: Union[str, None] = None):
@@ -43,44 +41,19 @@ async def create_file(file_base_64: Union[str, None] = None):
             return JSONResponse(content=result, status_code=200)
         else:
             result = {
-                "data": "",
                 "message":"Unexpected Error",
                 "success": False
             }
             return JSONResponse(content=result, status_code=400)
     except:
         result = {
-            "data": "",
             "message":"Unexcepted Error",
             "success": False
         }
         return JSONResponse(content=result, status_code=500)
 
-@app.post("/createQuery/{query}")
-def read_item(query: str):
 
-    if query != None:
-
-        result = {
-            "data": query,
-            "message":"Process is successful!",
-            "success": True
-        }
-
-        return JSONResponse(content=result, status_code=200)
-
-    else:
-
-        result = {
-            "data": "",
-            "message":"Query Failed!",
-            "success": False
-        }
-
-        return JSONResponse(content=result, status_code=400)
-
-
-@app.post("/createQuery2")
+@app.post("/createQuery")
 def read_item(query: Union[str, None] = None):
 
     if query != None:
@@ -96,17 +69,23 @@ def read_item(query: Union[str, None] = None):
     else:
 
         result = {
-            "data": "",
             "message":"Query Failed!",
             "success": False
         }
 
         return JSONResponse(content=result, status_code=400)
+    
 
 @app.get("/")
 def connection_checkpoint():
-   
-     return JSONResponse(content="Redis connection isa successfuly!",status_code=200)
+    result = {            
+            "message":"Redis connection isa successfuly!",
+            "success": True
+        }
+    return JSONResponse(content=result ,status_code=200)
+
+
 
 if __name__ == '__main__':
+  
     uvicorn.run(app,host="127.0.0.1",port=8000)
