@@ -10,7 +10,10 @@ import uvicorn
 
 
 
-#Started
+# If you create redis please download Docker and run this command;
+# docker container run --name=docker-container -d -p 6379:6379 redis
+
+# Download this packages
 # pip install fastapi "uvicorn[standard]"
 # pip install pillow
 # pip install python-multipart
@@ -99,13 +102,11 @@ def read_item(query: Union[str, None] = None):
         }
 
         return JSONResponse(content=result, status_code=400)
-        
-@app.get("/checkpoint")
+
+@app.get("/")
 def connection_checkpoint():
-    if redis_client.ping():
-        return JSONResponse(content="Redis connection is successfuly!",status_code=200)
-    else:
-        return JSONResponse(content="Redis connection is not successfuly!",status_code=500)
+   
+     return JSONResponse(content="Redis connection is not successfuly!",status_code=200)
 
 if __name__ == '__main__':
     uvicorn.run(app,host="127.0.0.1",port=8000)
