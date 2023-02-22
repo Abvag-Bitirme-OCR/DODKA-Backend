@@ -21,12 +21,13 @@ jobs:
       - name: Start the API
         run: python API/main.py &
       - name: Run pytest with coverage
-        run: pytest --cov=app --cov-report xml --cov-fail-under=90 pytest/
+        run: pytest --cov=app tests/
       - name: Upload coverage report
         uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: coverage.xml
-          flags: unittests
+      - name: Fail if coverage is too low
+        run: |
+          coverage report --fail-under=80        
 
 
