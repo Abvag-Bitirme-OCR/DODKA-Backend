@@ -1,75 +1,104 @@
-from fastapi import FastAPI, File
+import base64
+from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from typing import Union
-import json
 from PIL import Image
 import io
-import redis
-import uvicorn
-import uuid
+import base64
 
-# If you create redis please download Docker and run this command;
-# docker container run --name=docker-container -d -p 6379:6379 redis
 
-# Download this packages
+
+
+
+#Started
 # pip install fastapi "uvicorn[standard]"
 # pip install pillow
 # pip install python-multipart
 
 
 app = FastAPI()
-redis_client = redis.Redis(host='localhost', port=6379, db=0)
+# Query from user (FromQuery)
+@app.post("/file")
+async def create_file(file_base_64: Union[str, None] = None):
+    try:
+        
+        if file_base_64 != None:        
 
-class Result():
+            #  have to escape this value 'data:image/jpeg;base64,' 
+            file_base_64 = file_base_64.split("base64,")[1]
+            # to image
+            img = Image.open(io.BytesIO(base64.decodebytes(bytes(file_base_64, "utf-8"))))
+            # save for example
+            img.save('my-image.png')
 
-    data: any
-    success: bool
-    message: str
+            result = {
+                "data": len(file_base_64),
+                "message":"Islem Basarili Bir Sekilde Gerceklesti",
+                "success": True
+            }
 
-    def __init__(self, data:any, success:bool, message:str) -> None:
-        self.data = data
-        self.success = success
-        self.message = message
+            return JSONResponse(content=result, status_code=200)
+        else:
+            result = {
+                "data": "",
+                "message":"Base64 Alinamadi",
+                "success": False
+            }
+            return JSONResponse(content=result, status_code=400)
+    except:
+        result = {
+            "data": "",
+            "message":"Bir Hata Ile Karsilasildi",
+            "success": False
+        }
+        return JSONResponse(content=result, status_code=500)
 
-def objectToJson(result:Result):
-
-    data = json.dumps(result.__dict__)
-    data = json.loads(data)
-
-    return data
-
-
-# File upload with RequestBody
-@app.post("/file/upload")
-async def create_file(file: bytes = File()):
-    image_id=uuid.uuid4()
-    redis_client.set(str(image_id),file,ex=900)
-    result = objectToJson(Result(len(file), True, "File transfer successfuly."))
-     
-    return JSONResponse(content=result, status_code=200)
-
-# Query method 1(Path Variable)
-@app.post("/query/create1/{query}")
+# Kullanıcıdan Sorgu alma 1. yöntem (PathVariable)
+@app.post("/createQuery/{query}")
 def read_item(query: str):
-    
-    result = objectToJson(Result(query, True, "Process succeeded."))
-    
-    return JSONResponse(content=result, status_code=200)
 
-# Query method 2 (Request Param)
-@app.post("/query/create2")
-def read_item(q: Union[str, None] = None):
+    if query != None:
 
-    result = objectToJson(Result(q, True, "Process succeeded."))
+        result = {
+            "data": query,
+            "message":"Islem Basarili Bir Sekilde Gerceklesti",
+            "success": True
+        }
 
-    return JSONResponse(content=result, status_code=200)
+        return JSONResponse(content=result, status_code=200)
 
-@app.get("/healthcheck")
-def connection_checkpoint():
-    if redis_client.ping():
-        return JSONResponse(content="Redis connection is successfuly!",status_code=200)
     else:
-        return JSONResponse(content="Redis connection is not successfuly!",status_code=500)
 
-if __name__ == '__main__':
-    uvicorn.run(app,host="127.0.0.1",port=8000)
+        result = {
+            "data": "",
+            "message":"Query Alinamadi",
+            "success": False
+        }
+
+        return JSONResponse(content=result, status_code=400)
+
+
+
+# Kullanıcıdan Sorgu alma 2. yöntem (RequestParams)
+@app.post("/createQuery2")
+def read_item(query: Union[str, None] = None):
+
+    if query != None:
+
+        result = {
+            "data": query,
+            "message":"Islem Basarili Bir Sekilde Gerceklesti",
+            "success": True
+        }
+
+        return JSONResponse(content=result, status_code=200)
+
+    else:
+
+        result = {
+            "data": "",
+            "message":"Query Alinamadi",
+            "success": False
+        }
+
+        return JSONResponse(content=result, status_code=400)
