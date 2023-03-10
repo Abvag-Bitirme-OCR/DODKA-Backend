@@ -6,3 +6,6 @@ redis
 pytest
 pytest-cov
 httpx
+pytesseract
+PIL
+roboflow
