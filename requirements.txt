@@ -7,5 +7,4 @@ pytest
 pytest-cov
 httpx
 pytesseract
-Pillow
 roboflow
