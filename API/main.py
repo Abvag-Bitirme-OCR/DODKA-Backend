@@ -8,6 +8,11 @@ import base64
 import redis
 import uvicorn
 
+import sys
+sys.path.append('../YOLO_OCR')
+from YOLO_OCR import YOLO_OCR
+
+
 # If you create redis please download Docker and run this command;
 # docker container run --name=docker-container -d -p 6379:6379 redis
 
@@ -17,23 +22,37 @@ import uvicorn
 # pip install python-multipart
 
 app = FastAPI()
+path = "../API/my-image.jpg"
 
 # Query from user (FromQuery)
 @app.post("/file")
 async def create_file(file_base_64: Union[str, None] = None):
+
     try:
         
         if file_base_64 != None:        
 
             #  have to escape this value 'data:image/jpeg;base64,' 
-            file_base_64 = file_base_64.split("base64,")[1]
-            # to image
-            img = Image.open(io.BytesIO(base64.decodebytes(bytes(file_base_64, "utf-8"))))
-            # save for example
-            img.save('my-image.png')
+            # file_base_64 = file_base_64.split("base64,")[1]
+            # # to image
+            # img = Image.open(io.BytesIO(base64.decodebytes(bytes(file_base_64, "utf-8"))))
+            # # save for example
+            # img.save('my-image.png')
+
+            yolo = YOLO_OCR.YoloStage()
+            yolo.build(path)
+
+
+            imageProcessing = YOLO_OCR.ImageProcessingStage()
+            imageProcessing.build(path)
+
+            ocr = YOLO_OCR.OCRStage()
+            ocr.build(yolo.predictions, imageProcessing.erosion)
+
+
 
             result = {
-                "data": len(file_base_64),
+                "data": ocr.text,
                 "message":"Process is successful!",
                 "success": True
             }
