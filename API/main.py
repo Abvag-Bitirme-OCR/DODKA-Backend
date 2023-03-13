@@ -9,8 +9,9 @@ import redis
 import uvicorn
 
 import sys
-sys.path.append('../YOLO_OCR')
+sys.path.append('.')
 from YOLO_OCR import YOLO_OCR
+
 
 
 # If you create redis please download Docker and run this command;
@@ -22,7 +23,7 @@ from YOLO_OCR import YOLO_OCR
 # pip install python-multipart
 
 app = FastAPI()
-path = "../API/my-image.jpg"
+
 
 # Query from user (FromQuery)
 @app.post("/file")
@@ -38,7 +39,7 @@ async def create_file(file_base_64: Union[str, None] = None):
             # img = Image.open(io.BytesIO(base64.decodebytes(bytes(file_base_64, "utf-8"))))
             # # save for example
             # img.save('my-image.png')
-
+            path = "../API/my-image.jpg"
             yolo = YOLO_OCR.YoloStage()
             yolo.build(path)
 
@@ -60,7 +61,7 @@ async def create_file(file_base_64: Union[str, None] = None):
             return JSONResponse(content=result, status_code=200)
         else:
             result = {
-                "message":"Unexpected Error",
+                "message":"assasa Error",
                 "success": False
             }
             return JSONResponse(content=result, status_code=400)
@@ -96,13 +97,49 @@ def read_item(query: Union[str, None] = None):
     
 
 @app.get("/")
-def connection_checkpoint():
+async def connection_checkpoint():
     result = {            
             "message":"Redis connection isa successfuly!",
             "success": True
         }
     return JSONResponse(content=result ,status_code=200)
 
+@app.get("/deneme")
+async def deneme():
+       try:
+            path =  "g310.jpg"
+            yolo = YOLO_OCR.YoloStage()
+            yolo.build(path)
+
+
+            imageProcessing = YOLO_OCR.ImageProcessingStage()
+            imageProcessing.build(path)
+
+            ocr = YOLO_OCR.OCRStage()
+            ocr.build(yolo.predictions, imageProcessing.erosion)
+
+
+
+            result = {
+                "data": ocr.text,
+                "message":"Process is successful!",
+                "success": True
+            }
+
+            return JSONResponse(content=result, status_code=200)
+       
+       except Exception as e:
+            
+    
+           
+            result = {
+                "data": "adsada",
+                "message":"Process is successful!",
+                "success": True
+            }
+
+            return JSONResponse(content=result, status_code=200)
+           
 
 
 if __name__ == '__main__':
